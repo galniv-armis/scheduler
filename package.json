@@ -6,10 +6,11 @@
   "scripts": {
     "build": "tsc",
     "prestart": "npm run build",
-    "tsc": "./node_modules/typescript/bin/tsc",
+    "tsc": "tsc",
     "start": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
     "test": "jest",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "postinstall": "npm run tsc"
   },
   "author": "Gal Niv",
   "dependencies": {
