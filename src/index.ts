@@ -5,7 +5,7 @@ import {collections} from "./services/database.service";
 import {scheduledJobsService} from "./services/scheduledJobs.service";
 
 const app = express();
-const port = 8080; // default port to listen
+const port = process.env.PORT || 80
 
 connectToDatabase()
     .then(() => {
