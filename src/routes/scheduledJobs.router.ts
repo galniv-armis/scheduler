@@ -57,7 +57,7 @@ scheduledJobsRouter.put("/:id", async (req: Request, res: Response) => {
     const id = req?.params?.id;
 
     try {
-        const result = await scheduledJobsService.update({...req.body, id: new ObjectId(id)});
+        const result = await scheduledJobsService.update({...req.body, _id: new ObjectId(id)});
 
         result
             ? res.status(200).send(`Successfully updated scheduledJob with id '${id}'.`)

@@ -15,7 +15,7 @@ export async function connectToDatabase() {
     await applySchemaValidation(db);
 
     // Persist the connection to the scheduledJobCollection collection.
-    const scheduledJobCollection = db.collection<ScheduledJob>(process.env.SCHEDCHULED_JOBS_COLLECTION_NAME);
+    const scheduledJobCollection = db.collection<ScheduledJob>(process.env.SCHEDULED_JOBS_COLLECTION_NAME);
     collections.scheduledJobs = scheduledJobCollection;
 
     console.log(
@@ -59,11 +59,11 @@ async function applySchemaValidation(db: mongoDB.Db) {
     };
 
     await db.command({
-        collMod: process.env.SCHEDCHULED_JOBS_COLLECTION_NAME,
+        collMod: process.env.SCHEDULED_JOBS_COLLECTION_NAME,
         validator: jsonSchema
     }).catch(async (error: mongoDB.MongoServerError) => {
             if (error.codeName === 'NamespaceNotFound') {
-                await db.createCollection(process.env.SCHEDCHULED_JOBS_COLLECTION_NAME, {validator: jsonSchema});
+                await db.createCollection(process.env.SCHEDULED_JOBS_COLLECTION_NAME, {validator: jsonSchema});
                 return;
             }
             console.error("Didn't apply schema validation!")
