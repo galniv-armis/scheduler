@@ -5,11 +5,12 @@ import {ScheduledJob, JobType} from "../models/scheduledJob";
 
 type DataProvider = Collection<ScheduledJob> // | more types
 
-const JOB_TYPE_TO_ACTION = new Map<JobType, (scheduledJobParams: object) => void>([
-    [JobType.Email, (scheduledJobParams: object) => console.log(`Sending email with config  ${scheduledJobParams}`)],
-    [JobType.BuildProject, (scheduledJobParams: object) => console.log(`Building a project with config ${scheduledJobParams}`)],
-    [JobType.MakeCoffee, (scheduledJobParams: object) => console.log(`Making coffee with config ${scheduledJobParams}`)],
-    [JobType.BuyPlainTicket, (scheduledJobParams: object) => console.log(`Buying a plane ticket with config ${scheduledJobParams}`)],
+
+export const JOB_TYPE_TO_ACTION = new Map<JobType, (scheduledJobParams: object) => void>([
+    [JobType.Email, (scheduledJobParams: object) => console.log(`Sending email with config  ${JSON.stringify(scheduledJobParams)}`)],
+    [JobType.BuildProject, (scheduledJobParams: object) => console.log(`Building a project with config ${JSON.stringify(scheduledJobParams)}`)],
+    [JobType.MakeCoffee, (scheduledJobParams: object) => console.log(`Making coffee with config ${JSON.stringify(scheduledJobParams)}`)],
+    [JobType.BuyPlainTicket, (scheduledJobParams: object) => console.log(`Buying a plane ticket with config ${JSON.stringify(scheduledJobParams)}`)],
 ])
 
 

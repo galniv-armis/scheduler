@@ -11,7 +11,7 @@ export interface ScheduledJob {
     title: string;
     description: string;
     jobType: JobType;
-    issuerUserId: string;
+    // issuerUserId: string; Would have added this after integrating with an auth service (I like Auth0) for role based permissions.
     cron?: string;
     jobParams?: object;
     _id?: ObjectId;
