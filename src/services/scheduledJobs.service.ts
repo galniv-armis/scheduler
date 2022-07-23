@@ -1,5 +1,5 @@
 import {CronJob} from 'cron';
-import {Collection, ObjectId} from "mongodb";
+import {Collection, ObjectId, Filter} from "mongodb";
 
 import {ScheduledJob, JobType} from "../models/scheduledJob";
 
@@ -24,12 +24,22 @@ class ScheduledJobsService {
 
     async setup(dataProvider: DataProvider) {
         this._dataProvider = dataProvider
-        const scheduledJobs = await this.getAllAsArray();
-        scheduledJobs.forEach((scheduledJob: ScheduledJob) => this.setCron(scheduledJob, false))
+
+        const activeJobsQuery: Filter<ScheduledJob> = {$or: [{cronTime: {$gt: new Date()}}, {cronTime: {$type: "string"}}]};
+        const scheduledJobs = await this.getAllAsArray(activeJobsQuery);
+        scheduledJobs.forEach((scheduledJob: ScheduledJob) => {
+            try {
+                this.setCron(scheduledJob)
+            } catch (e) {
+                console.log(`Failed to schedule job with id: ${scheduledJob._id}`)
+                console.log(e);
+            }
+
+        })
     }
 
-    async getAllAsArray() {
-        return await this._dataProvider.find({}).toArray();
+    async getAllAsArray(documentQuery: Filter<ScheduledJob> = {}) {
+        return await this._dataProvider.find(documentQuery).toArray();
     }
 
     async get(scheduledJobId: ObjectId) {
@@ -37,6 +47,7 @@ class ScheduledJobsService {
     }
 
     async create(newScheduledJob: ScheduledJob) {
+        newScheduledJob = transformCronTimeIfNeeded(newScheduledJob);
         const result = await this._dataProvider.insertOne(newScheduledJob);
         if (result) {
             this.setCron({...newScheduledJob, _id: new ObjectId(result.insertedId)})
@@ -61,26 +72,28 @@ class ScheduledJobsService {
         return result
     }
 
+    dispatchImmediate(newScheduledJob: ScheduledJob) {
+        JOB_TYPE_TO_ACTION.get(newScheduledJob.jobType)(newScheduledJob.jobParams);
+    }
 
-    private setCron(scheduledJob: ScheduledJob, runImmediateJobs: boolean = true) {
-        if (scheduledJob.cron === undefined) {
-            if (runImmediateJobs) {
-                JOB_TYPE_TO_ACTION.get(scheduledJob.jobType)(scheduledJob.jobParams);
-            }
-            return;
-        }
 
+    private setCron(scheduledJob: Partial<ScheduledJob>) {
         const scheduledJobId = scheduledJob._id.toString();
         const existingJob = this._scheduledJobs.get(scheduledJobId);
         existingJob?.stop()
-        const newCronJob = new CronJob(scheduledJob.cron, () => {
-            try {
-                JOB_TYPE_TO_ACTION.get(scheduledJob.jobType)(scheduledJob.jobParams);
-            } catch (e) {
-                console.error(e);
-            }
+        const newCronJob = new CronJob(scheduledJob.cronTime, () => {
+            JOB_TYPE_TO_ACTION.get(scheduledJob.jobType)(scheduledJob.jobParams);
+            this.deleteCronIfDue(newCronJob, scheduledJobId);
         }, null, true)
         this._scheduledJobs.set(scheduledJobId, newCronJob);
+    }
+
+    private deleteCronIfDue(newCronJob: CronJob, scheduledJobId: string) {
+        try {
+            newCronJob.nextDates()
+        } catch (e) {
+            this.deleteCron(scheduledJobId);
+        }
     }
 
     private deleteCron(scheduledJobId: string) {
@@ -88,7 +101,15 @@ class ScheduledJobsService {
         existingJob?.stop()
         this._scheduledJobs.delete(scheduledJobId);
     }
+}
 
+
+const transformCronTimeIfNeeded = (newScheduledJob: ScheduledJob) => {
+    let cronTime = newScheduledJob.cronTime;
+    if (typeof cronTime === "string" && Date.parse(cronTime)) {
+        cronTime = new Date(cronTime);
+    }
+    return {...newScheduledJob, cronTime};
 }
 
 export const scheduledJobsService = new ScheduledJobsService();
