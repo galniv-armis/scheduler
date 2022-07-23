@@ -10,7 +10,8 @@ See documentation below for more details of how to use the api.
 ## Features & Code Refactors
 1. Add a UI to the service.
 2. Support authentication of users & role based permissions.
-3. Add a separate interface for Jobs & extend it in ScheduledJobs (as I later realized the immediate jobs don't really belong to this type).
+3. Add type validation for cronTime in the mongoDB schema. 
+4. Add a separate interface for Jobs & extend it in ScheduledJobs (as I later realized the immediate jobs don't really belong to this type).
 
 ## Testing & CI
 1. Improve the unit tests to not really wait for crons to fire.
