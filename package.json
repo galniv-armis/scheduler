@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "prestart": "npm run build",
-    "tsc": "tsc",
+    "tsc": "./node_modules/typescript/bin/tsc",
     "start": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
     "test": "jest",
     "format": "prettier . --write",
@@ -19,6 +19,7 @@
     "express": "^4.17.1",
     "mongodb": "^4.0.1",
     "typescript": "^4.7.4"
+
   },
   "devDependencies": {
     "@babel/core": "^7.18.9",
