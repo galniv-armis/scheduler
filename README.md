@@ -56,12 +56,13 @@ All API endpoints status codes adhere the conventions for REST api.
     "cronTime": "* * * * * *"
 }
 
-// Runs on 17/12/2023
+// Runs on 12/17/2022
 {
     "title": "Buy a ticket to Taiwan",
     "description": "But me a ticket using my credit card.",
     "jobType": "BUY_PLANE_TICKET",
-    "jobParams": {"creditCardInfo": "maybe not a good idea to include here"}
+    "jobParams": {"creditCardInfo": "maybe not a good idea to include here"},
+    "cronTime": "12/17/2022"
 }
 
 // Immediate 
