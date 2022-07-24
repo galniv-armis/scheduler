@@ -7,13 +7,17 @@ export enum JobType {
     BuyPlainTicket = "BUY_PLANE_TICKET",
 }
 
-export interface ScheduledJob {
+export interface Job {
     title: string;
     description: string;
     jobType: JobType;
+
+    jobParams?: object;
+}
+
+export interface ScheduledJob extends Job {
+    cronTime: string | Date;
     // issuerUserId: string; Would have added this after integrating with an auth service (I like Auth0) for role based permissions.
 
-    cronTime?: string | Date;
-    jobParams?: object;
     _id?: ObjectId;
 }

@@ -1,7 +1,7 @@
 import {CronJob} from 'cron';
 import {Collection, ObjectId, Filter} from "mongodb";
 
-import {ScheduledJob, JobType} from "../models/scheduledJob";
+import {ScheduledJob, JobType, Job} from "../models/scheduledJob";
 
 type DataProvider = Collection<ScheduledJob> // | more types
 
@@ -71,8 +71,8 @@ class ScheduledJobsService {
         return result;
     }
 
-    dispatchImmediate(newScheduledJob: ScheduledJob) {
-        JOB_TYPE_TO_ACTION.get(newScheduledJob.jobType)(newScheduledJob.jobParams);
+    dispatchImmediate(newJob: Job) {
+        JOB_TYPE_TO_ACTION.get(newJob.jobType)(newJob.jobParams);
     }
 
 

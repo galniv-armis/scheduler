@@ -1,6 +1,15 @@
 # Introduction
 A simple scheduler service api server implemented in Typescript using Node.js & MongoDB.
 The server implements a `REST api` for `CRUD` operations to `scheduled-jobs`.
+A scheduled job can run immediately, on a specific time or be recurring.
+
+Time for a job can be anything javascript's built-in `Date` object can parse.
+Schedule for recurring jobs should be a `CRON expression`.
+
+For more details about `CRON expressions` see:
+https://en.wikipedia.org/wiki/Cron#CRON_expression <br/>
+https://crontab.guru/ <br/>
+https://www.npmjs.com/package/cron
 
 You're welcome to use the deployed service available in: https://a-team-scheduler-api.herokuapp.com/
 
@@ -11,16 +20,17 @@ See documentation below for more details of how to use the api.
 1. Add a UI to the service.
 2. Support authentication of users & role based permissions.
 3. Add type validation for cronTime in the mongoDB schema. 
-4. Add a separate interface for Jobs & extend it in ScheduledJobs (as I later realized the immediate jobs don't really belong to this type).
 
 ## Testing & CI
 1. Improve the unit tests to not really wait for crons to fire.
 2. Add integration tests.
 
-## Scale
-In case the amount of data is too large to fit in memory the service supports raising more instances, each instance can manage a subset of the data using its data provider.
-
-Another approach could be to only save ids & crons for a job & delegate the job execution to another serve. 
+## Ideas For Scaling
+1. The service supports raising more instances, each instance can manage a subset of the data using its data provider.
+2. Use scheduledJobsService only to persist changes to the data provider & notify (via API / MQ) other microservices to execute jobs on their schedule. 
+3. Only save ids & crons for each job & pull the needed data from the provider only when the job is triggered.
+4. Add a periodic time based trigger that loads from the data provider only jobs that are due before the next trigger (edit setup method & run in periodically).
+5. Update getAllAsArray to return a cursor & use it instead of loading all results directly to memory.  
 
 
 # API documentation
